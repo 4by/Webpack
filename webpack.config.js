@@ -2,6 +2,8 @@ const path = require('path')
 const htmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+
 
 
 //process это обьект Node.js
@@ -37,7 +39,16 @@ module.exports = {
         filename: filename('js'),
         path: path.resolve(__dirname, 'dist')
     },
-
+    resolve: {
+        //среди каких расширений будет искать тип файла, если мы не указали его при испорте
+        //по умолчанию ищет js, json
+        extensions: [".js", ".json", ".png"],
+        alias: {
+            //можно так заменять значения при импорте
+            '@models': path.resolve(__dirname, 'src/models'),
+            '@': path.resolve(__dirname, 'src'),
+        }
+    },
 
 
     plugins: [
@@ -55,7 +66,19 @@ module.exports = {
 
         new MiniCssExtractPlugin({
             filename: filename('css'),
-        })
+        }),
+
+        //отправляет файлы напрямую в сборку
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: path.resolve(__dirname, 'src/favicon.ico'),
+                    to: path.resolve(__dirname, 'dist')
+                }
+            ]
+        }),
+
+
 
     ],
 
@@ -75,18 +98,18 @@ module.exports = {
                 use: cssLoaders('sass-loader')
             },
             {
-                test: /\.(ttf|woff|woff2|eot)$/,
+                //файлы (здесь форматы картинок, шрифтов) загрузили не через лоадер, а способом с вебпак5
+                test: /\.(png|jpg|svg|gif|ttf|woff|woff2|eot)$/,
                 type: 'asset/resource'
             },
-
             {
                 test: /\.(xml)$/,
                 use: ['xml-loader']
-              },
-              {
+            },
+            {
                 test: /\.(csv)$/,
                 use: ['csv-loader']
-              },
+            },
 
 
         ]
