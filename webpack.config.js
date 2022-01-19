@@ -3,7 +3,8 @@ const htmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-
+const TerserWebpackPlugin = require('terser-webpack-plugin')
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 
 //process это обьект Node.js
@@ -25,6 +26,25 @@ const cssLoaders = extra => {
     if (extra) loaders.push(extra)
     return loaders
 }
+
+
+const optimization = () => {
+    const config = {
+        splitChunks: {
+            //если мы импортировали одну библиотеку несколько раз - вебпак вынесет ее в отдельный файл (vendors...)
+            chunks: 'all'
+        }
+    }
+    if (!isDev) {
+        config.minimizer = [
+            //оптимизаторы для css
+            new TerserWebpackPlugin(),
+            new CssMinimizerPlugin()
+        ]
+    }
+    return config
+}
+
 
 
 module.exports = {
@@ -49,7 +69,17 @@ module.exports = {
             '@': path.resolve(__dirname, 'src'),
         }
     },
+    optimization: optimization(),
+    devServer: {
+        //обновление данных без обновления страницы работает с этой опцией
+        static: './',
+        port: 4200,
+        //??
+        hot: isDev
+    },
 
+    //возвращает то, какой исходный код будет в режиме разработки (полный список с преимуществами и недостатками в документации webpack)
+    devtool: isDev ? 'source-map' : false,
 
     plugins: [
         //создает в сборке файл index.html
@@ -60,6 +90,7 @@ module.exports = {
 
             //документ на основе которого происходит сборка
             template: './index.html',
+            minify: { collapseWhitespace: !isDev }
         }),
         //очищает прошлые файлы сборки
         new CleanWebpackPlugin(),
