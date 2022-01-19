@@ -1,5 +1,7 @@
 const path = require('path')
 const htmlWebpackPlugin = require('html-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 
 //process это обьект Node.js
@@ -7,10 +9,20 @@ const isDev = process.argv[3] === 'development'
 
 const filename = ext => isDev ? `[name].${ext}` : `[name].[hash].${ext}`
 
+const cssLoaders = extra => {
+    //установили эти лоадеры отдельно для css
+    //работают справа-налево
+    //css-loader расшифровывает css
+    //MiniCssExtractPlugin (содержащий лоадер) создает отдельные css файлы
+    //(вместо него могли бы использовать style-loader, который просто загружает css в html)
 
-
-
-
+    const loaders = [{
+        loader: MiniCssExtractPlugin.loader,
+        options: {},
+    }, 'css-loader']
+    if (extra) loaders.push(extra)
+    return loaders
+}
 
 
 module.exports = {
@@ -38,5 +50,27 @@ module.exports = {
             //документ на основе которого происходит сборка
             template: './index.html',
         }),
+        //очищает прошлые файлы сборки
+        new CleanWebpackPlugin(),
+
+        new MiniCssExtractPlugin({
+            filename: filename('css'),
+        })
+
     ],
+
+    module: {
+        rules: [
+            {
+                test: /\.css$/,
+                use: cssLoaders()
+            },
+
+
+
+        ]
+    }
+
+
+
 }
