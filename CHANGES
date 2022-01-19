@@ -1,3 +1,0 @@
-npm init
-npm i -D webpack webpack-cli
-(запуск сборки: ./node_modules/.bin/webpack --mode development)
