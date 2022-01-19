@@ -1,4 +1,7 @@
 @import "roboto.css";
+/*c node_modules подключаем через тильду */
+@import "~normalize.css";
+
 
 body {
     font-family: 'Roboto', sans-serif;

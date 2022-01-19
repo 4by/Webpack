@@ -79,6 +79,15 @@ module.exports = {
                 type: 'asset/resource'
             },
 
+            {
+                test: /\.(xml)$/,
+                use: ['xml-loader']
+              },
+              {
+                test: /\.(csv)$/,
+                use: ['csv-loader']
+              },
+
 
         ]
     }
