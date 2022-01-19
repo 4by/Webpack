@@ -65,7 +65,19 @@ module.exports = {
                 test: /\.css$/,
                 use: cssLoaders()
             },
+            {
+                test: /\.less$/,
+                use: cssLoaders('less-loader')
+            },
 
+            {
+                test: /\.(sass|scss)$/,
+                use: cssLoaders('sass-loader')
+            },
+            {
+                test: /\.(ttf|woff|woff2|eot)$/,
+                type: 'asset/resource'
+            },
 
 
         ]
