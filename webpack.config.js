@@ -10,7 +10,7 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 //process это обьект Node.js
 const isDev = process.argv[3] === 'development'
 
-const filename = ext => isDev ? `[name].${ext}` : `[name].[hash].${ext}`
+const filename = ext => isDev ? `[name].${ext}` : `[name].[fullhash].${ext}`
 
 const cssLoaders = extra => {
     //установили эти лоадеры отдельно для css
@@ -18,7 +18,6 @@ const cssLoaders = extra => {
     //css-loader расшифровывает css
     //MiniCssExtractPlugin (содержащий лоадер) создает отдельные css файлы
     //(вместо него могли бы использовать style-loader, который просто загружает css в html)
-
     const loaders = [{
         loader: MiniCssExtractPlugin.loader,
         options: {},
@@ -27,6 +26,22 @@ const cssLoaders = extra => {
     return loaders
 }
 
+const jsLoaders = preset => {
+    const loaders = [
+      {
+        //babel преобразовывает слишком старый (или эксперементально новый) код в тот, который понимают браузеры
+        loader: "babel-loader",
+        options: {
+          //preset это конфигурация, в которую будет конвертировать код babel
+          presets: ['@babel/preset-env'],
+          //плагины для бейбла (в данном случае поставили плагин, чтобы бейбл видел эксперементальные возм-ти языка)
+          plugins: ['@babel/plugin-proposal-class-properties']
+        }
+      }
+    ]
+    if (preset) loaders[0].options.presets.push(preset)
+    return loaders
+  }
 
 const optimization = () => {
     const config = {
@@ -51,7 +66,9 @@ module.exports = {
     context: path.resolve(__dirname, 'src'),
     //файлы, импортирующиеся в сборочный index.html
     entry: {
-        main: './index.js',
+        // помимо основного файла для того, чтобы бейбл видел новые возможности
+        // также запускаем полифилл для babble (см.документацию babble)
+        main: ['@babel/polyfill', './index.jsx'],
         analytics: "./analytics.js"
     },
     //как преобразуется входящий файл
@@ -141,8 +158,16 @@ module.exports = {
                 test: /\.(csv)$/,
                 use: ['csv-loader']
             },
-
-
+            {
+                test: /\.m?js$/,
+                exclude: /node_modules/,
+                use: jsLoaders()
+            },
+            {
+                test: /\.m?jsx$/,
+                exclude: /node_modules/,
+                use: jsLoaders('@babel/preset-react')
+              }
         ]
     }
 
