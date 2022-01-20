@@ -1,0 +1,28 @@
+{
+    //поскольку еслинт не знает что мы работает с бейблом ему надо явно указать определенный парсер
+    "parser": "@babel/eslint-parser",
+    "parserOptions": {
+        // "requireConfigFile": false,
+        "babelOptions": {}
+    },
+    "extends": [
+        "eslint:recommended"
+    ],
+    "overrides": [
+        {
+            "files": [
+                "*.jsx",
+                "*.js"
+            ]
+        }
+    ],
+    //чтобы еслинт понимал некоторые сущности, например промисы
+    "env": {
+        "es6": true,
+        "browser": true
+    },
+    "rules": {
+        "no-unused-vars": "warn",
+        "indent": "warn"
+    }
+}

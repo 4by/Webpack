@@ -27,7 +27,7 @@ const App = () => (
     <div className="container">
         <h1>Webpack course</h1>
         <hr/>
-         <div className="logo"/>
+        <div className="logo"/>
         <hr/>
         <pre></pre>
         <hr/>
@@ -46,6 +46,8 @@ const App = () => (
 
 render(<App/>, document.getElementById('app'))
 
+//динамический импорт(ленивая загрузка) создаст отдельный файл в сборке (с библиотекой и действием)
+//статический импорт загружал все библитотеки и действия скриптов
 
 
 

@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const TerserWebpackPlugin = require('terser-webpack-plugin')
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 
 //process это обьект Node.js
@@ -28,20 +29,21 @@ const cssLoaders = extra => {
 
 const jsLoaders = preset => {
     const loaders = [
-      {
-        //babel преобразовывает слишком старый (или эксперементально новый) код в тот, который понимают браузеры
-        loader: "babel-loader",
-        options: {
-          //preset это конфигурация, в которую будет конвертировать код babel
-          presets: ['@babel/preset-env'],
-          //плагины для бейбла (в данном случае поставили плагин, чтобы бейбл видел эксперементальные возм-ти языка)
-          plugins: ['@babel/plugin-proposal-class-properties']
+        {
+            //babel преобразовывает слишком старый (или эксперементально новый) код в тот, который понимают браузеры
+            loader: "babel-loader",
+            options: {
+                //preset это конфигурация, в которую будет конвертировать код babel
+                presets: ['@babel/preset-env'],
+                //плагины для бейбла (в данном случае поставили плагин, чтобы бейбл видел эксперементальные возм-ти языка)
+                plugins: ['@babel/plugin-proposal-class-properties']
+            }
         }
-      }
     ]
     if (preset) loaders[0].options.presets.push(preset)
+
     return loaders
-  }
+}
 
 const optimization = () => {
     const config = {
@@ -121,10 +123,17 @@ module.exports = {
             patterns: [
                 {
                     from: path.resolve(__dirname, 'src/favicon.ico'),
-                    to: path.resolve(__dirname, 'dist')
+                    to: path.resolve(__dirname, 'dist'),
                 }
             ]
         }),
+
+        //чтобы при сборке вызывался еслинт
+        new ESLintPlugin({
+            extensions: ['js', 'jsx'],
+            // формат при сборке, чтобы не делать npx eslint ./src --fix
+            fix: true
+        })
 
 
 
@@ -167,7 +176,7 @@ module.exports = {
                 test: /\.m?jsx$/,
                 exclude: /node_modules/,
                 use: jsLoaders('@babel/preset-react')
-              }
+            }
         ]
     }
 
