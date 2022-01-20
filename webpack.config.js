@@ -6,6 +6,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const TerserWebpackPlugin = require('terser-webpack-plugin')
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const ESLintPlugin = require('eslint-webpack-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 
 //process это обьект Node.js
@@ -64,6 +65,47 @@ const optimization = () => {
 
 
 
+
+const plugins = () => {
+    const base = [
+        //создает в сборке файл index.html
+        new htmlWebpackPlugin({
+            //отправляет информацию в тег <title>
+            // title: "Webpack Eugene",
+            //документ на основе которого происходит сборка
+            template: './index.html',
+            minify: { collapseWhitespace: !isDev }
+        }),
+        //очищает прошлые файлы сборки
+        new CleanWebpackPlugin(),
+
+        new MiniCssExtractPlugin({
+            filename: filename('css'),
+        }),
+
+        //отправляет файлы напрямую в сборку
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: path.resolve(__dirname, 'src/favicon.ico'),
+                    to: path.resolve(__dirname, 'dist'),
+                }
+            ]
+        }),
+
+        //чтобы при сборке вызывался еслинт
+        new ESLintPlugin({
+            extensions: ['js', 'jsx'],
+            // формат при сборке, чтобы не делать npx eslint ./src --fix
+            fix: true
+        })
+    ]
+    //можно добавлять стату и так, но у нас для этого отдельный скрипт
+    //  if (!isDev) base.push(new BundleAnalyzerPlugin()) 
+    return base
+}
+
+
 module.exports = {
     context: path.resolve(__dirname, 'src'),
     //файлы, импортирующиеся в сборочный index.html
@@ -100,44 +142,7 @@ module.exports = {
     //возвращает то, какой исходный код будет в режиме разработки (полный список с преимуществами и недостатками в документации webpack)
     devtool: isDev ? 'source-map' : false,
 
-    plugins: [
-        //создает в сборке файл index.html
-        new htmlWebpackPlugin({
-
-            //отправляет информацию в тег <title>
-            // title: "Webpack Eugene",
-
-            //документ на основе которого происходит сборка
-            template: './index.html',
-            minify: { collapseWhitespace: !isDev }
-        }),
-        //очищает прошлые файлы сборки
-        new CleanWebpackPlugin(),
-
-        new MiniCssExtractPlugin({
-            filename: filename('css'),
-        }),
-
-        //отправляет файлы напрямую в сборку
-        new CopyWebpackPlugin({
-            patterns: [
-                {
-                    from: path.resolve(__dirname, 'src/favicon.ico'),
-                    to: path.resolve(__dirname, 'dist'),
-                }
-            ]
-        }),
-
-        //чтобы при сборке вызывался еслинт
-        new ESLintPlugin({
-            extensions: ['js', 'jsx'],
-            // формат при сборке, чтобы не делать npx eslint ./src --fix
-            fix: true
-        })
-
-
-
-    ],
+    plugins: plugins(),
 
     module: {
         rules: [

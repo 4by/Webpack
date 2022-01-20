@@ -7,7 +7,8 @@
     "dev": "./node_modules/.bin/webpack --mode development",
     "build": "./node_modules/.bin/webpack --mode production",
     "watch": "./node_modules/.bin/webpack --mode development --watch",
-    "start": "./node_modules/.bin/webpack serve --mode development"
+    "start": "./node_modules/.bin/webpack serve --mode development",
+    "stats": "./node_modules/.bin/webpack --json > stats.json && webpack-bundle-analyzer stats.json"
   },
   "author": "",
   "license": "ISC",
