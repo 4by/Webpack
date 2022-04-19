@@ -2,7 +2,6 @@
     //поскольку еслинт не знает что мы работает с бейблом ему надо явно указать определенный парсер
     "parser": "@babel/eslint-parser",
     "parserOptions": {
-        // "requireConfigFile": false,
         "babelOptions": {}
     },
     "extends": [
